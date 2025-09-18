@@ -1,0 +1,23 @@
+{
+    "window": {
+        "size": {
+            "width": 900,
+            "height": 450
+        },
+
+        "title": "Kei Editor",
+        "transparent": true,
+
+        "color": {
+            "bg": "#0e0e0eff"
+        }
+    },
+
+    "editor": {
+        "color": {
+            "bg": "#ffffff"
+        },
+
+        "font": "MapleMono NF"
+    }
+}
