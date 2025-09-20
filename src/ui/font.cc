@@ -1,11 +1,9 @@
-#include "interface/font.hh"
+#include "ui/font.hh"
 
 #include <filesystem>
 
 #include <fontconfig/fontconfig.h>
-#include "logger.hh"
 
-namespace fs = std::filesystem;
 using ui::ttf::Font;
 
 
@@ -13,8 +11,8 @@ Font::Font( const std::string &p_name ) :
     m_font(TTF_OpenFont(get_path_from_name(p_name).c_str(), DEFAULT_FONT_SIZE))
 {
     if (m_font == nullptr)
-        logger->FATAL("Failed to open font {}: {}", p_name, SDL_GetError());
-    logger->DEBUG("Font {} created", p_name);
+        throw FontException("Failed to open font {}: {}",
+                             p_name, SDL_GetError());
 }
 
 
@@ -55,10 +53,8 @@ Font::get_path_from_name( const std::string &p_name ) -> fs::path
     const auto *name { reinterpret_cast<const FcChar8 *>(p_name.c_str()) };
 
     FcPattern *pattern { FcNameParse(name) };
-    if (pattern == nullptr) {
-        logger->ERROR("Failed to parse font name {}", p_name);
-        return {};
-    }
+    if (pattern == nullptr)
+        throw FontException("Failed to parse font name {}", p_name);
 
     FcConfigSubstitute(config, pattern, FcMatchPattern);
     FcDefaultSubstitute(pattern);

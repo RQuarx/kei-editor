@@ -1,8 +1,7 @@
-subdir('interface')
+subdir('core')
+subdir('event')
+subdir('ui')
 
 source_files = files(
-    'config.cc',
-    'logger.cc',
-    'main.cc',
-    'utils.cc',
-) + interface_files
+    'main.cc'
+) + core_files + event_files + ui_files

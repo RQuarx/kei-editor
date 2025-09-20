@@ -1,20 +1,20 @@
 #pragma once
 #include <filesystem>
 #include <json/value.h>
+#include "logger.hh"
 
 namespace fs = std::filesystem;
 
-class Logger;
 
-template<typename T>
-concept StringLike = std::same_as<std::decay_t<T>, std::string>
-                  || std::same_as<std::decay_t<T>, std::string_view>
-                  || std::same_as<std::decay_t<T>, const char*>;
-
+class Config;
+using shared_config = std::shared_ptr<Config>;
 
 class Config
 {
 public:
+    Config( shared_logger p_logger, fs::path p_path = "" );
+
+
     /**
      * @brief Constructs a Config instance.
      *
@@ -22,7 +22,8 @@ public:
      *               the constructor will search in
      *               $XDG_CONFIG_HOME and /etc/APP_NAME/.
      */
-    Config( fs::path p_path = "" );
+    static auto create( shared_logger p_logger,
+                        fs::path      p_path = "" ) -> shared_config;
 
 
     /**
@@ -55,6 +56,8 @@ public:
     auto get_int( const std::string &p_keys ) const -> int;
 
 private:
+    shared_logger m_logger;
+
     fs::path    m_config_path;
     Json::Value m_config;
 

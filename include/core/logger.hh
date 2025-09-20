@@ -12,21 +12,14 @@ class Logger
 {
     using label_pair = std::pair<std::string_view, std::string_view>;
 public:
-    struct StringSource
-    {
-        std::string_view fmt;
-        std::source_location source;
-
-        StringSource( const char          *p_fmt,
-                      std::source_location p_source =
-                      std::source_location::current() ) :
-            fmt(p_fmt), source(p_source) {}
-    };
-
-
     Logger( const std::string &p_log_level,
             const std::string &p_log_file = "" );
 
+
+    [[nodiscard]]
+    static auto create( const std::string &p_level,
+                        const std::string &p_file = ""
+                      ) -> std::shared_ptr<Logger>;
 
     template<unsigned T_LogLevel, typename... T_Args>
     void
@@ -95,4 +88,4 @@ private:
 };
 
 
-inline std::unique_ptr<Logger> logger;
+using shared_logger = std::shared_ptr<Logger>;

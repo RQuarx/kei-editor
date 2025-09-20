@@ -1,4 +1,4 @@
-#include "interface/color.hh"
+#include "ui/color.hh"
 
 #define CLAMP01(x) ((x) < 0.0f ? 0.0f : ((x) > 1.0f ? 1.0f : (x)))
 
@@ -36,11 +36,12 @@ Color::Color( SDL_Color p_color ) :
 Color::Color( const std::string &p_hex )
 {
     if (p_hex.empty() || p_hex[0] != '#')
-        logger->FATAL("Hex must start with '#': {}", p_hex);
+        throw ParsingError("Hex must start with '#': {}", p_hex);
 
     const size_t len { p_hex.length() };
     if (len != 7 && len != 9)
-        logger->FATAL("Hex values must be in '#RRGGBB' or '#RRGGBBAA' format");
+        throw ParsingError("Hex values must be in '#RRGGBB' or "
+                           "'#RRGGBBAA' format: {}", p_hex);
 
     r = hex_to_byte(p_hex.substr(1, 2));
     g = hex_to_byte(p_hex.substr(3, 2));

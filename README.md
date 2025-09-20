@@ -17,13 +17,13 @@ Kei Editor or Keditor for short, is a text/code editor made with C++23 and SDL3.
 
 ### Build from source
 
-```console
-$ git clone https://github.com/RQuarx/kei-editor
-$ cd kei-editor
-$ meson setup target -Dbuildtype=release
-$ meson compile -C target
+```bash
+git clone https://github.com/RQuarx/kei-editor
+cd kei-editor
+meson setup target -Dbuildtype=release
+meson compile -C target
 
-$ ./target/keditor
+./target/keditor
 ```
 
 ## Attribution

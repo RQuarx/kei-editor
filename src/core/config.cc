@@ -1,14 +1,20 @@
-#include "config.hh"
+#include "core/config.hh"
 
 #include <algorithm>
 #include <utility>
 
 #include "DEFAULT_CONFIG.hh"
-#include "logger.hh"
-#include "utils.hh"
+#include "core/exception.hh"
+#include "core/utils.hh"
 
 
-Config::Config( fs::path p_path )
+auto
+Config::create( shared_logger p_logger, fs::path p_path ) -> shared_config
+{ return std::make_shared<Config>(p_logger, p_path); }
+
+
+Config::Config( shared_logger p_logger, fs::path p_path ) :
+    m_logger(std::move(p_logger))
 {
     if (!p_path.empty())
         m_config_path = std::move(p_path);
@@ -36,7 +42,7 @@ Config::Config( fs::path p_path )
     }
 
     if (m_config_path.empty()) {
-        logger->WARN("No config file found, using default config");
+        m_logger->WARN("No config file found, using default config");
         m_config = get_default_config();
     } else
         parse_config();
@@ -46,11 +52,11 @@ Config::Config( fs::path p_path )
 void
 Config::parse_config()
 {
-    logger->INFO("Parsing configuration file {}", m_config_path.string());
+    m_logger->INFO("Parsing configuration file {}", m_config_path.string());
 
     std::ifstream file { m_config_path };
     if (!file.is_open()) {
-        logger->ERROR("Failed to open config file, using default config: {}",
+        m_logger->ERROR("Failed to open config file, using default config: {}",
                        std::strerror(errno));
         m_config = get_default_config();
         return;
@@ -59,7 +65,8 @@ Config::parse_config()
     Json::Value obj = *Json::from_stream(file).or_else(
     [this]( const std::string &p_e ) -> std::expected<Json::Value, std::string>
     {
-        logger->ERROR("Failed to parse config, using default config: {}.", p_e);
+        m_logger->ERROR("Failed to parse config, "
+                        "using default config: {}.", p_e);
 
         m_config = get_default_config();
         return Json::nullValue;
@@ -104,7 +111,7 @@ Config::get( const std::string &p_keys ) const -> Json::Value
     std::istringstream iss { p_keys };
     for (std::string segment; std::getline(iss, segment, '.');) {
         if (!current->isMember(segment))
-            logger->FATAL("Key {} not found!", p_keys);
+            m_logger->FATAL("Key {} not found!", p_keys);
         current = &(*current)[segment];
     }
 
@@ -128,7 +135,7 @@ Config::get_default_config() -> Json::Value
     return *Json::from_string(DEFAULT_CONFIG_JSON_STRING).or_else(
     []( const std::string &p_err ) -> std::expected<Json::Value, std::string>
     {
-        logger->FATAL("Failed to parse default config: {}", p_err);
+        throw ParsingError("Failed to parse default config: {}", p_err);
         return {};
     } );
 }

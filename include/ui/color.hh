@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <string>
 #include <SDL3/SDL_pixels.h>
-#include "logger.hh"
+#include "core/exception.hh"
 
 
 namespace ui
@@ -63,7 +63,8 @@ hex_to_byte( const std::string &p_str ) -> uint8_t
     unsigned int x;
     std::istringstream iss { p_str };
     iss >> std::hex >> x;
-    if (iss.fail()) logger->FATAL("Invalid hex value in color: {}", p_str);
+    if (iss.fail())
+        throw ParsingError("Invalid hex value in color: {}", p_str);
     return static_cast<uint8_t>(x);
 }
 
@@ -73,11 +74,11 @@ operator""_rgb( const char *p_hex ) -> ui::Color
 {
     const std::string hex { p_hex };
     if (hex.empty() || hex[0] != '#')
-        logger->FATAL("Color must start with '#': {}", hex);
+        throw ParsingError("Color must start with '#': {}", hex);
 
     const size_t len { hex.length() };
     if (len != 7)
-        logger->FATAL("Color values must be in '#RRGGBB' format");
+        throw ParsingError("Color values must be in '#RRGGBB' format: {}", hex);
 
     return ui::Color {
         hex_to_byte(hex.substr(1, 2)),
@@ -92,11 +93,12 @@ operator""_rgba( const char *p_hex ) -> ui::Color
 {
     const std::string hex { p_hex };
     if (hex.empty() || hex[0] != '#')
-        logger->FATAL("Color must start with '#': {}", hex);
+        throw ParsingError("Color must start with '#': {}", hex);
 
     const size_t len { hex.length() };
     if (len != 9)
-        logger->FATAL("Color values must be in '#RRGGBBAA' format");
+        throw ParsingError("Color values must be in '#RRGGBBAA' format: {}",
+                            hex);
 
     return ui::Color {
         hex_to_byte(hex.substr(1, 2)),

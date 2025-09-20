@@ -2,10 +2,15 @@
 #include <filesystem>
 #include <string>
 #include <SDL3_ttf/SDL_ttf.h>
+#include "core/exception.hh"
 
 
 namespace ui::ttf
 {
+    class FontException : public Exception
+    { public: using Exception::Exception; };
+
+
     namespace fs = std::filesystem;
 
 

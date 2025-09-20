@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <cstring>
 #include <chrono>
-#include "logger.hh"
+#include "core/logger.hh"
 
 
 namespace
@@ -28,6 +28,12 @@ namespace
         return 5;
     }
 }
+
+
+auto
+Logger::create( const std::string &p_level,
+                const std::string &p_file ) -> shared_logger
+{ return std::make_shared<Logger>(p_level, p_file); }
 
 
 Logger::Logger( const std::string &p_log_level,
