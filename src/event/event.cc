@@ -19,7 +19,7 @@ Handler::run_handlers( uint32_t   p_key,
     std::vector<SDL_AppResult> res;
     res.reserve(funcs.size());
 
-    for (const _event_signature &func : funcs)
+    for (const _signature &func : funcs)
         res.emplace_back(func(p_event));
     return res;
 }

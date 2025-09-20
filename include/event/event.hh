@@ -9,7 +9,7 @@ namespace event
 {
     class Handler
     {
-        using _event_signature =
+        using _signature =
             std::function<SDL_AppResult ( SDL_Event * )>;
     public:
         Handler( shared_logger p_logger );
@@ -19,7 +19,7 @@ namespace event
         void
         add_handler( uint32_t p_key, T_Func &&p_func, T_Params &&...p_params )
         {
-            _event_signature handler =
+            _signature handler =
                 [func  = std::forward<T_Func>(p_func),
                  bound = std::make_tuple(std::forward<T_Params>(p_params)...)]
                 ( SDL_Event *p_event ) -> SDL_AppResult
@@ -36,7 +36,7 @@ namespace event
                      T_Func      &&p_method,
                      T_Params &&...p_params )
         {
-            _event_signature handler =
+            _signature handler =
                 [&p_instance, p_method,
                   bound = std::make_tuple(std::forward<T_Params>(p_params)...)]
                 ( SDL_Event *p_event ) -> SDL_AppResult
@@ -60,7 +60,7 @@ namespace event
 
     private:
         shared_logger m_logger;
-        std::unordered_map<uint32_t, std::vector<_event_signature>> m_handlers;
+        std::unordered_map<uint32_t, std::vector<_signature>> m_handlers;
 
 
         template<typename T_Instance,
@@ -117,7 +117,7 @@ namespace event
 }
 
 
-#define EVENT_SIGNATURE( ... )                \
+#define EVENT_LAMB_SIGNATURE( ... )           \
     []( SDL_Event *p_event ) -> SDL_AppResult \
     {                                         \
         __VA_ARGS__                           \
