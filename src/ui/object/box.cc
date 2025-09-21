@@ -8,13 +8,16 @@ using ui::Box;
 
 
 auto
-Box::rounded( f_pair p_pos, f_pair p_size, Color p_col, float p_radius ) -> Box
+Box::rounded( const TPair<float> &p_pos,
+              const TPair<float> &p_size,
+              Color               p_col,
+              float               p_radius ) -> Box
 {
     return {
-        .x=p_pos.x,
-        .y=p_pos.y,
-        .w=p_size.x,
-        .h=p_size.y,
+        .x=p_pos._0,
+        .y=p_pos._1,
+        .w=p_size._0,
+        .h=p_size._1,
         .color=p_col,
         .rounded_corner=true,
         .radius=p_radius
@@ -23,13 +26,16 @@ Box::rounded( f_pair p_pos, f_pair p_size, Color p_col, float p_radius ) -> Box
 
 
 auto
-Box::square( f_pair p_pos, f_pair p_size, Color p_col, bool p_filled ) -> Box
+Box::square( const TPair<float> &p_pos,
+             const TPair<float> &p_size,
+             Color               p_col,
+             bool                p_filled ) -> Box
 {
     return {
-        .x=p_pos.x,
-        .y=p_pos.y,
-        .w=p_size.x,
-        .h=p_size.y,
+        .x=p_pos._0,
+        .y=p_pos._1,
+        .w=p_size._0,
+        .h=p_size._1,
         .color=p_col,
         .rounded_corner=false,
         .filled=p_filled
@@ -38,10 +44,10 @@ Box::square( f_pair p_pos, f_pair p_size, Color p_col, bool p_filled ) -> Box
 
 
 auto
-Box::contains( f_pair p_pos ) const -> bool
+Box::contains( const TPair<float> &p_pos ) const -> bool
 {
-    return p_pos.x >= x && p_pos.x <= x + w
-        && p_pos.y >= y && p_pos.y <= y + h;
+    return p_pos._0 >= x && p_pos._0 <= x + w
+        && p_pos._1 >= y && p_pos._1 <= y + h;
 }
 
 
@@ -56,24 +62,24 @@ Box::intersects( const Box &p_other ) const -> bool
 
 
 auto
-Box::center() const -> f_pair
+Box::center() const -> TPair<float>
 { return { x + (w * 0.5F), y + (h * 0.5F) }; }
 
 
 auto
-Box::move( f_pair p_distance ) -> Box &
+Box::move( const TPair<float> &p_distance ) -> Box &
 {
-    x += p_distance.x;
-    y += p_distance.y;
+    x += p_distance._0;
+    y += p_distance._1;
     return *this;
 }
 
 
 auto
-Box::resize( f_pair p_new ) -> Box &
+Box::resize( const TPair<float> &p_new ) -> Box &
 {
-    w = p_new.x;
-    h = p_new.y;
+    w = p_new._0;
+    h = p_new._1;
     return *this;
 }
 

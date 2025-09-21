@@ -7,7 +7,8 @@ using event::Handler;
 
 Handler::Handler( shared_logger p_logger ) :
     m_logger(std::move(p_logger))
-{}
+{
+}
 
 
 auto

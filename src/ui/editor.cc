@@ -3,6 +3,7 @@
 #include "ui/context/context.hh"
 #include "event/event.hh"
 #include "core/config.hh"
+#include "core/types.hh"
 
 using ui::Editor;
 
@@ -42,17 +43,15 @@ Editor::add_event_handlers( event::Handler &p_handler )
 auto
 Editor::on_mouse_hover( SDL_Event *p_event ) -> SDL_AppResult
 {
-    SDL_FPoint cursor { .x=p_event->motion.x, .y=p_event->motion.y };
+    auto cursor { TPair<float>::create(p_event->motion.x, p_event->motion.y) };
     m_active = m_area.contains(cursor);
 
     if (m_active && !m_cursor_set) {
-        m_logger->DEBUG("editor focussed");
         SDL_SetCursor(m_beam_cursor);
         m_cursor_set = true;
 
         m_ctx->toggle_text_input();
     } else if (!m_active && m_cursor_set) {
-        m_logger->DEBUG("editor unfocussed");
         SDL_SetCursor(m_default_cursor);
         m_cursor_set = false;
 

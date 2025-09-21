@@ -4,37 +4,49 @@
 
 #include "ui/context/exception.hh"
 #include "ui/object/box.hh"
-#include "ui/font.hh"
-#include "core/config.hh"
 
 using ui::CtxException;
+using ui::WindowData;
 using ui::Context;
 static constexpr SDL_WindowFlags WINDOW_FLAGS {
     SDL_WINDOW_RESIZABLE | SDL_WINDOW_TRANSPARENT };
 
 
-Context::Context( const std::shared_ptr<Config> &p_config ) :
-    config(p_config)
+auto
+WindowData::from_config( shared_config &p_conf ) -> WindowData
+{
+    return {
+        .title=p_conf->get("window.title").asCString(),
+        .bg_color=p_conf->get_string("window.color.bg"),
+        .w=p_conf->get_int("window.size.width"),
+        .h=p_conf->get_int("window.size.height"),
+        .transparent=p_conf->get("window.transparent").asBool()
+    };
+}
+
+
+auto
+Context::create( const WindowData &p_data ) -> shared_ctx
+{ return std::make_shared<Context>(p_data); }
+
+
+Context::Context( const WindowData &p_data ) :
+    m_window_bg(p_data.bg_color)
 {
     FcInit();
+
     if (!SDL_Init(SDL_INIT_VIDEO))
         CtxException("Failed to initialize SDL: {}", SDL_GetError());
     if (!TTF_Init())
         CtxException("Failed to initialize SDL_TTF: {}", SDL_GetError());
 
 
-    auto w { config->get_int("window.size.width") };
-    auto h { config->get_int("window.size.height") };
-    const auto title { config->get_string("window.title") };
-
-    if (!SDL_CreateWindowAndRenderer(title.c_str(), w, h, WINDOW_FLAGS,
-                                    &window, &render))
+    if (!SDL_CreateWindowAndRenderer(p_data.title, p_data.w, p_data.h,
+                                     WINDOW_FLAGS, &window, &render))
         CtxException("Failed to create window: {}", SDL_GetError());
 
     SDL_SetRenderVSync(render, 1);
     SDL_SetRenderDrawBlendMode(render, SDL_BLENDMODE_BLEND);
-
-    fill_fonts();
 }
 
 
@@ -46,13 +58,13 @@ Context::~Context()
 
 
 auto
-Context::operator[]( const std::string &p_key ) -> ttf::Font &
-{ return fonts.at(p_key); }
-
-
-auto
-Context::get_renderer() const -> SDL_Renderer *
-{ return render; }
+Context::get_window_size() const -> TPair<float>
+{
+    int w { 0 };
+    int h { 0 };
+    SDL_GetWindowSizeInPixels(window, &w, &h);
+    return Pair<float, float>::create(w, h);
+}
 
 
 void
@@ -63,7 +75,7 @@ Context::set_draw_color( const Color &p_color ) const
 void
 Context::render_window() const
 {
-    set_draw_color(config->get_string("window.color.bg"));
+    set_draw_color(m_window_bg);
     SDL_RenderPresent(render);
     SDL_RenderClear(render);
 }
@@ -77,8 +89,3 @@ Context::toggle_text_input() const
     else
         SDL_StartTextInput(window);
 }
-
-
-void
-Context::fill_fonts()
-{ fonts.emplace("editor.font", ttf::Font(config->get_string("editor.font"))); }

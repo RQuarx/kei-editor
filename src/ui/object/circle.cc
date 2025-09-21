@@ -114,6 +114,7 @@ auto
 Circle::center() const -> SDL_FPoint
 { return { x, y }; }
 
+
 auto
 Circle::move( SDL_FPoint p_distance ) -> Circle &
 {
@@ -122,6 +123,7 @@ Circle::move( SDL_FPoint p_distance ) -> Circle &
     return *this;
 }
 
+
 auto
 Circle::resize( float p_radius ) -> Circle &
 {
@@ -129,11 +131,12 @@ Circle::resize( float p_radius ) -> Circle &
     return *this;
 }
 
+
 void
 Circle::draw( const Context &p_ctx ) const
 {
     p_ctx.set_draw_color(color);
 
-    filled ? draw_circle_filled(p_ctx.render, { x, y }, radius)
+    filled ? draw_circle_filled (p_ctx.render, { x, y }, radius)
            : draw_circle_outline(p_ctx.render, { x, y }, radius);
 }

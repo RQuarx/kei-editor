@@ -1,5 +1,6 @@
 #pragma once
 #include <functional>
+#include <mutex>
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_init.h>
 #include "core/logger.hh"
@@ -19,6 +20,7 @@ namespace event
         void
         add_handler( uint32_t p_key, T_Func &&p_func, T_Params &&...p_params )
         {
+            std::lock_guard<std::mutex> lock { m_mutex };
             _signature handler =
                 [func  = std::forward<T_Func>(p_func),
                  bound = std::make_tuple(std::forward<T_Params>(p_params)...)]
@@ -36,6 +38,7 @@ namespace event
                      T_Func      &&p_method,
                      T_Params &&...p_params )
         {
+            std::lock_guard<std::mutex> lock { m_mutex };
             _signature handler =
                 [&p_instance, p_method,
                   bound = std::make_tuple(std::forward<T_Params>(p_params)...)]
@@ -60,6 +63,7 @@ namespace event
 
     private:
         shared_logger m_logger;
+        std::mutex m_mutex;
         std::unordered_map<uint32_t, std::vector<_signature>> m_handlers;
 
 
