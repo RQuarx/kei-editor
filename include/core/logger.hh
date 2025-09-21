@@ -30,27 +30,21 @@ public:
         std::string msg { std::vformat(p_fmt,
                           std::make_format_args(p_args...)) };
 
-        std::string func { p_loc.function_name() };
         std::string file { p_loc.file_name() };
         unsigned    line { p_loc.line() };
 
-        func = func.substr(0, func.find('('));
-
-        if (func.contains(' '))
-            func = func.substr(func.find_first_of(' ') + 1);
-
         std::string label {
-            std::format("{} {} at \033[1m{}\033[0m( \033[1;30m{}:{}\033[0;0m )",
+            std::format("{} {} at \033[1m{}:{}\033[0m",
                          get_time(),
                          m_LABELS.at(T_LogLevel).first,
-                         func, file, line) };
+                         file, line) };
 
         if (m_log_file.is_open()) {
             std::string file_label {
-                std::format("{} at {}( {}:{} )",
+                std::format("{} at {}:{}",
                              get_time(),
                              m_LABELS.at(T_LogLevel).second,
-                             func, file, line) };
+                             file, line) };
 
             m_log_file << std::format("[{}]: {}", file_label, msg) << '\n';
             m_log_file.flush();
